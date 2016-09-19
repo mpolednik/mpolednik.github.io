@@ -1,8 +1,0 @@
----
-layout: post
-title: Realtime host in oVirt
----
-
-test
-
-{% include image.html name="plot.png" caption="test" width="100%" %}
