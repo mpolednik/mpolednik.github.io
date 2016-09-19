@@ -6,14 +6,14 @@ highlighter:      rouge
 permalink:        pretty
 
 # Setup
-title:            mpolednik.io
+title:            mpolednik.github.io
 tagline:          'virtualization & tech blog'
 description:      'A software engineer contributing to oVirt project...'
-url:              http://mpolednik.io
+url:              http://mpolednik.github.io
 
 author:
   name:           'Martin Polednik'
-  url:            http://mpolednik.io
+  url:            http://mpolednik.github.io
 
 paginate:         5
 
