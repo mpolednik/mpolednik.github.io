@@ -138,7 +138,7 @@ Before rebooting into our new and fancy RT environment, there is one more step t
 
 {% include image.html name="ovirt-kernel-cmdline.png" width="100%" %}
 
-Notice the free-entry text field with two new parameters: `isolcpus=6,7,8,9and `nohz_full=6,7,8,9`.
+Notice the free-entry text field with two new parameters: `isolcpus=6,7,8,9` and `nohz_full=6,7,8,9`.
 
 These parameters allow us to isolate given CPUs (in our case it's CPUs 6, 7, 8 and 9) so that the kernel doesn't schedule anything onto them and avoids scheduling-clock ticks against these CPUs.
 
