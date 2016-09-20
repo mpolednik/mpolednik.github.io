@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Real-time host in oVirt
+comments: true
 ---
 
 ## Introduction
