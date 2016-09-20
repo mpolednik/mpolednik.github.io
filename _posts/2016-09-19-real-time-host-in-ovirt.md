@@ -7,6 +7,19 @@ title: Real-time host in oVirt
 
 With [VFIO](https://vfio.blogspot.com) and [SR-IOV](https://en.wikipedia.org/wiki/Single-root_input/output_virtualization), virtualization is now capable of delivering network bandwidth and latency comparable to bare-metal machines. To exploit this in latency sensitive environment such as [NFV](https://en.wikipedia.org/wiki/Network_function_virtualization), real-time (RT) operating system is required. [oVirt](http://www.ovirt.org/) does not really have an concept of RT hosts and guests at the moment, I was wondering whether it is possible to have such host nevertheless. As it turns out, with a bit of tweaking and hacking, it's possible!
 
+## PoC Setup
+
+The following post was done with the help of my workstation:
+
+* Asus Z10PE-D8 WS
+* Intel(R) Xeon(R) CPU E5-2650 v3 @ 2.30GHz
+* 64 GiB RAM
+* 2x NVIDIA Corporation GM107GL [Quadro K2200]
+* NIC #1: Intel Corporation I210 Gigabit Network Connection
+* NIC #2: Intel Corporation 82576 Gigabit Network Connection
+
+It's not proper RT system but rather generic VFIO/SR-IOV/GPU assignment development machine.
+
 ## BIOS Setup
 
 Our first step into the RT world should be the BIOS. To eliminate latency spikes, our main objective is to heavily reduce the amount of non maskable interrupts ([NMIs](http://wiki.osdev.org/Non_Maskable_Interrupt)). Unfortunately, as BIOS isn't anywhere near standardized, this is highly hardware dependent step. In ideal world, we would consult the manufacturer for recommended RT settings. For our small test setup, it should be enough to disable power management, SMIs and various CPU power saving modes.
