@@ -6,7 +6,7 @@ comments: true
 
 ## Introduction
 
-KVM and QEMU support two paravirtualized storage backends: the older virtio-blk and more modern virtio-scsi. Fully emulated devices are not in scope of this post as their performance is subpar<sup>[1]</sup> and shouldn't be used except for compatibility purposes -- like CD-ROMs. We won't focus on the fine grained difference between virtio-blk and virtio-scsi. Why? You can find multiple benchmarks and comparisons online<sup>[2]</sup><sup>[3]</sup><sup>[4]</sup>. The idea is to go over the high-level difference between the backends as our main focus is determining suitability in enterprise deployments managed by [oVirt](http://www.ovirt.org/).
+KVM and QEMU support two paravirtualized storage backends: the older virtio-blk and more modern virtio-scsi. Fully emulated devices are not in scope of this post as their performance is subpar<sup>[1]</sup> and shouldn't be used except for compatibility purposes -- like CD-ROMs. We won't focus on the fine grained difference between virtio-blk and virtio-scsi. Why? You can find multiple benchmarks and comparisons online<sup>[2]</sup><sup>[3]</sup><sup>[4]</sup>. The idea is to go over the high-level difference between the backends as our main focus is to determine the suitability in enterprise deployments managed by [oVirt](http://www.ovirt.org/).
 
 How is virtio-blk different from virtio-scsi? Let's begin with the architecture. 
 
@@ -30,7 +30,7 @@ This is where things get interesting. Major user facing difference is actual dev
 
 ## Maximum Number of Devices
 
-virtio-blk links PCI and storage devices in 1:1 relationship, or in other words -- each disk is accompanied by PCI device. The PCI bus is limited to 32 devices. Based on these facts<sup>[5]</sup>, we can define the maximum number of virtio-blk devices as (32 - #ovirt_default_devices) where #ovirt_default_devices are superset of QEMU default devices. Using 4.2 master branch of oVirt, we have 11 PCI devices by default (12 if virtio-scsi disk is used). Using the equation, we get $32 - 11 = 21$ available virtio-blk slots.
+virtio-blk links PCI and storage devices in a 1:1 relationship, or in other words -- each disk is accompanied by a PCI device. The PCI bus is limited to 32 devices. Based on these facts<sup>[5]</sup>, we can define the maximum number of virtio-blk devices as (32 - #ovirt_default_devices) where #ovirt_default_devices are superset of QEMU default devices. Using 4.2 master branch of oVirt, we have 11 PCI devices by default (12 if virtio-scsi disk is used). Using the equation, we get $32 - 11 = 21$ available virtio-blk slots.
 
 virtio-scsi also has limited total number of available drives. The virtio-scsi controller can have up to 256 "targets", and each target can have up to 16,384 "LUNs" -- or what we consider drives. The theoretical limit is therefore 4194304 LUNs per controller. Browsing through kernel history, the limit was once set to $26 + 26 ^ 2 + 26 ^ 3 = 18278$ LUNs, but the limitation has been lifted<sup>[6]</sup>. The question "how many LUNs really are supported" is left as an exercise. :)
 
@@ -110,25 +110,27 @@ The tests are in following order:
 {% include image.html name="combined-read.png" width="100%" %}
 {% include image.html name="combined-write.png" width="100%" %}
 
-The read performance for first 3 (randread) tests is slightly in favor of virtio-blk. In low IO depth scenario without IO threads, virtio-scsi seems to deliver only ~75 % of virtio-blk read performance. As IO depth increases, virtio-scsi without IO threads delivers slightly broader read bandwidth. On the other hand, virtio-blk seems to scale well with IO threads in scenarios where IO depth = 4 and IO depth = 8.
+The read performance for the first 3 (randread) tests is slightly in favor of virtio-blk. In the low IO depth scenario without IO threads, virtio-scsi seems to deliver only ~75 % of the virtio-blk read performance. As the IO depth increases, virtio-scsi without IO threads delivers slightly broader read bandwidth. On the other hand, virtio-blk seems to scale well with IO threads in scenarios where IO depth is 4 and 8.
 
-In the next 3 (randrw, 25 % writes) tests, virtio-blk stays ahead even in higher IO depth scenarios in read performance and slightly ahead in write performance. Clear winner.
+In the next 3 (randrw, 25 % writes) tests, virtio-blk stays ahead even in higher IO depth scenarios with a higher read performance and just a slightly higher write performance.
 
-Moving up to more write-intensive (randrw, 50 % writes), the results are mixed -- IO thread scaling is mostly visible in (IO depth = 4 scenario, IO threads = 8) and (IO depth = 8, IO threads = 4) cases. That being said, virtio-scsi (without IO threads) delivers almost the bandwidth of virtio-blk with 8 IO threads in IO depth = 4 case. Interesting.
+Moving up to more write-intensive (randrw, 50 % writes), the results are mixed -- IO thread scaling is mostly visible in (IO depth = 4 scenario, IO threads = 8) and (IO depth = 8, IO threads = 4) cases. That being said, virtio-scsi (without IO threads) delivers almost the bandwidth of virtio-blk with 8 IO threads in IO depth = 4 case.
 
-When we mostly write (randrw, 75 % writes) the virtio-blk stays ahead by at least 5 % in read bandwidth; write bandwidth shows difference of up to 25 % (= jumpy!).
+Interesting.
 
-Pure write tests again show slightly subpar performance of virtio-scsi, the jumps are definitely not as if we mixed the reads in. (At 75 % write, we're really mixing in reads rather than writes. :) )
+In write-intensive workloads (randrw, 75 % writes) virtio-blk stays ahead by at least 5 % for read bandwidth. The virtio-blk write bandwidth shows an improvement between 2 % and 25 %.
+
+Write-only tests were done for completeness and show no significant performance difference.
 
 {% include image.html name="combined-iops.png" width="100%" %}
 
-When it comes to IOPS, randread in low IO depth case shows slight drop in virtio-scsi 0 IO thread case, but remains close in other cases. As IO depth increases, virtio-scsi takes the lead. Mixing writes into the read (25 %, 50 %), virtio-scsi is either leader or within few % of virtio-blk at worst with IOPS dropping as we add IO threads. Randwrite doesn't show any statistically significant difference.
+When it comes to IOPS, randread in low IO depth case shows slight drop in virtio-scsi 0 IO thread case, but remains close throughout other cases. As IO depth increases, virtio-scsi takes the lead. Mixing writes into the reads (25 %, 50 %), virtio-scsi is either leader or within few % of virtio-blk at worst with IOPS dropping as we add IO threads. Randwrite doesn't show any statistically significant difference.
 
-Summarized, virtio-scsi is slightly underperforming compared to virtio-blk and slowly catches up in high IO depth scenarios as expected. As for whether there is any sane IO thread default, my personal opinion is that there is not. To maximize the performance, user has to benchmark with regard to workload and derive from that.
+Summarized, virtio-scsi is slightly underperforming compared to virtio-blk and slowly catches up in high IO depth scenarios as expected. Whether there is any sane default for number of IO threads, my personal opinion is that there is not. To maximize the performance, user has to benchmark with regard to workload and derive from that.
 
 ## Features
 
-Key difference here is BLKDISCARD capability only supported by virtio-scsi. virtio-blk does not and most likely will not (due to difficulty of extending virtio-blk driver) support it. BLKDISCARD is ioctl that discards blocks on device -- for example using ATA TRIM command on modern SSDs. As for the future features, they will most likely focus virtio-scsi first -- again due to complexity of extending virtio-blk.
+Key difference is BLKDISCARD capability supported by virtio-scsi. virtio-blk does not and most likely will not (due to difficulty of extending virtio-blk driver) support it. BLKDISCARD is ioctl that discards blocks on device -- for example using ATA TRIM command on modern SSDs. As for the future features, they will most likely focus virtio-scsi first -- again due to complexity of extending virtio-blk.
 
 ## Conclusions
 
