@@ -124,17 +124,17 @@ Write-only tests were done for completeness and show no significant performance 
 
 {% include image.html name="combined-iops.png" width="100%" %}
 
-When it comes to IOPS, randread in low IO depth case shows slight drop in virtio-scsi 0 IO thread case, but remains close throughout other cases. As IO depth increases, virtio-scsi takes the lead. Mixing writes into the reads (25 %, 50 %), virtio-scsi is either leader or within few % of virtio-blk at worst with IOPS dropping as we add IO threads. Randwrite doesn't show any statistically significant difference.
+When it comes to IOPS, randread in low IO depth case shows a slight drop for virtio-scsi without IO threads, but remains close throughout the other cases. As IO depth increases, virtio-scsi takes the lead. When mixing writes with reads (25 %, 50 %), virtio-scsi is either the leader or in the worst case within few % of virtio-blk. As we add IO threads, IOPS are dropping. Randwrite doesn't have any statistically significant impact.
 
-Summarized, virtio-scsi is slightly underperforming compared to virtio-blk and slowly catches up in high IO depth scenarios as expected. Whether there is any sane default for number of IO threads, my personal opinion is that there is not. To maximize the performance, user has to benchmark with regard to workload and derive from that.
+In summary, virtio-scsi is performing slightly worse than virtio-blk. However as expected, it is slowly catching up in high IO depth scenarios. My conclusion is that there is no default for the number of IO threads that would be generally optimal. To maximize the performance, users would have to benchmark with regards to their workloads and derive the best configuration from that.
 
 ## Features
 
-Key difference is BLKDISCARD capability supported by virtio-scsi. virtio-blk does not and most likely will not (due to difficulty of extending virtio-blk driver) support it. BLKDISCARD is ioctl that discards blocks on device -- for example using ATA TRIM command on modern SSDs. As for the future features, they will most likely focus virtio-scsi first -- again due to complexity of extending virtio-blk.
+At the moment, a key difference is the BLKDISCARD capability, supported by virtio-scsi. BLKDISCARD is an ioctl, that discards blocks on a device -- for example using ATA TRIM command on modern SSDs. virtio-blk does not support it and probably never will. As for other potential features, they will most likely be implemented in virtio-scsi first. Due to the complexity of extending virtio-blk it is questionable that any new features will ever be added.
 
 ## Conclusions
 
-Looking at advantages of virtio-scsi, I believe it's the correct choice as default VM disk interface in oVirt. For optimized VMs, there is always choice of manually switching to virtio-blk (and IDE, if you're optimizing for slowness... or compatibility). For now, adding IO thread may cause more harm than good, therefore we'll leave that for a future.
+Looking at the advantages of virtio-scsi, I believe it's the correct choice as a default VM disk interface in oVirt. For optimized VMs, there is always the choice of manually switching to virtio-blk (or IDE, if you're optimizing for slowness... or compatibility). For now, adding IO thread may cause more harm than good, therefore we'll leave that for the future.
 
 [1]: https://kparal.wordpress.com/2012/09/12/kvm-disk-performance-ide-vs-virtio/
 [2]: https://ervikrant06.wordpress.com/2016/10/16/difference-between-virtio-blk-vs-virtio-scsi/
