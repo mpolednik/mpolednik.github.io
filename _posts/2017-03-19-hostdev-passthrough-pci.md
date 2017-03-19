@@ -38,6 +38,8 @@ In practice, there is a bit more going on. Let's start with summary what kind of
 - kernel version that knows how to work with IOMMU,
 - a bit of luck.
 
+{% include image.html name="bios.png" width="100%" %}
+
 If you have all that, you're halfway there! Why only halfway? You can see the word [IOMMU](https://en.wikipedia.org/wiki/Input%E2%80%93output_memory_management_unit) mentioned. Practically, IOMMU groups your devices by the level of isolation there is between them on the PCI level. Great example is yet again GPU -- consumer grade GPUs usually come as two devices, one being the actual GPU whereas the second one is a sound card for HDMI output. These two devices (as far as I have seen) are not isolated on the hardware level. That means they are within the same IOMMU group, and that means they can only be passed to a VM as a group. More specifically, the whole group has to be bound to vfio-pci driver, and any of the devices within that group can be passed to a VM. Small caveat is that if there is a PCI bridge within that group, you shouldn't unbind or pass it through. [Clever software](https://www.ovirt.org/) should handle that for you.
 
 Additionally, if you happen to have a hardware that you want to dedicate to a VM, it is safe not to bind it to it's original driver when system boots up as you could be risking host crash or similar - due to poor driver code.
