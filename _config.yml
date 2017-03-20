@@ -10,6 +10,7 @@ title:            mpolednik.github.io
 tagline:          'virtualization & tech blog'
 description:      'A software engineer and virtualization enthusiast working on oVirt project.'
 url:              http://mpolednik.github.io
+excerpt_separator: '<!--more-->'
 
 author:
   name:           'Martin Polednik'

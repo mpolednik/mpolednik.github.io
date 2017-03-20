@@ -8,6 +8,8 @@ comments: true
 
 KVM and QEMU support two paravirtualized storage backends: the older virtio-blk and more modern virtio-scsi. Fully emulated devices are not in scope of this post as their performance is subpar<sup>[1]</sup> and shouldn't be used except for compatibility purposes -- like CD-ROMs. We won't focus on the fine grained difference between virtio-blk and virtio-scsi. Why? You can find multiple benchmarks and comparisons online<sup>[2]</sup><sup>[3]</sup><sup>[4]</sup>. The idea is to go over the high-level difference between the backends as our main focus is to determine the suitability in enterprise deployments managed by [oVirt](http://www.ovirt.org/).
 
+<!--more-->
+
 How is virtio-blk different from virtio-scsi? Let's begin with the architecture. 
 
 virtio-blk:

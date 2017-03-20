@@ -8,6 +8,8 @@ comments: true
 
 With [VFIO](https://vfio.blogspot.com) and [SR-IOV](https://en.wikipedia.org/wiki/Single-root_input/output_virtualization), virtualization is now capable of delivering network bandwidth and latency comparable to bare-metal machines. To exploit this in latency sensitive environment such as [NFV](https://en.wikipedia.org/wiki/Network_function_virtualization), real-time (RT) operating system is required. [oVirt](http://www.ovirt.org/) does not really have an concept of RT hosts and guests at the moment, I was wondering whether it is possible to have such host nevertheless. As it turns out, with a bit of tweaking and hacking, it's possible!
 
+<!--more-->
+
 ## PoC Setup
 
 The following post was done with the help of my workstation:
