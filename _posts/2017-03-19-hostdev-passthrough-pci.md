@@ -20,7 +20,7 @@ What can we achieve with that?
 
 ## Use Cases
 
-Well, one of the easiest examples is gaming. If you are one of many people who happen to dislike proprietary operating systems, it goes without saying that gaming (on a casual level, let's not even get started with professional gaming) is one of the reasons why you may have such OS on a desktop at home. There is a multitude of variables that make gaming fun -- input latency (how long does it take for your key presses and mouse movement to be registered), hardware compatibility, performance (network, graphics) and, of course, the game itself. Trying to play a game on Linux may come with a quirks that reduce the fun. Bad graphics performance isn't fun.
+Well, one of the easiest examples is gaming. If you are one of many people who happen to dislike Microsoft Windows, it goes without saying that gaming (on a casual level, let's not even get started with professional gaming) is one of the reasons why you may have Windows on a desktop at home. There is a multitude of variables that make gaming fun -- input latency (how long does it take for your key presses and mouse movement to be registered), hardware compatibility, performance (network, graphics) and, of course, the game itself. Trying to play a game on Linux may come with a quirks that reduce the fun. Bad graphics performance isn't fun.
 
 Instead of trying to fix all the issues you have on Linux, or going for a proprietary software, it's possible to compromise. Imagine running a Linux on your bare metal desktop and your gaming "PC" as a virtual machine. See where I'm going?
 
