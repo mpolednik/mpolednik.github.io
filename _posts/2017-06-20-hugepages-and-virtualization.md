@@ -28,7 +28,7 @@ Process specific hugepages are allocated either at boot time via kernel command 
 
 ## Hugepages and Virtualization
 
-Virtual machine (VM, NOT virtual memory in this post) is an unusual breed of a process. The host OS contains the whole memory of the guest OS in it's RAM, along with some overhead caused by devices (virtio, graphics, ...). That means we have a process that allocates huge chunk of host's memory and runs whole operating system within it, with memory accesses all over it. That, along with various database applications, sounds like perfect opportunity to use hugepages.
+Virtual machine (VM, NOT virtual memory in this post) is an unusual breed of a process. The host OS contains the whole memory of the guest OS in its RAM, along with some overhead caused by devices (virtio, graphics, ...). That means we have a process that allocates huge chunk of host's memory and runs whole operating system within it, with memory accesses all over it. That, along with various database applications, sounds like perfect opportunity to use hugepages.
 
 QEMU itself is able to use preallocated hugepages to back guest OS' memory by specifying `-m 1024 -mem-prealloc -mem-path /path/to/hugepages` arguments on the qemu-kvm command line. If you are not into fiddling with command line, libvirt is able to translate the following XML snippet into the same command line:
 
