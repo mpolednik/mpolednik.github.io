@@ -6,7 +6,7 @@ comments: true
 
 ## Introduction
 
-"Ansible is the simplest way to automate apps and IT infrastructure." Or at least that's what they say. I've been thinking of it for quite a while but only recently decided to give it a go (for last two days!). How does Ansible work in slightly unusual software development setup? Let's see.
+"Ansible is the simplest way to automate apps and IT infrastructure." Or at least that's what they say. I've been thinking of it for quite a while but only recently decided to give it a go (like, two days ago!). Let's see how Ansible works in slightly unusual software development setup.
 
 <!--more-->
 
@@ -90,7 +90,7 @@ $ cat groups_vars/everything
 ansible_user: root
 ```
 
-Why root? Quite evil thing is that I use the machines as a root most of the time. Maybe with proper configuration management (wink wink Ansible), this habit will perish.
+Using root is quite an evil thing -- and yet I use the machines as root most of the time. Maybe with proper configuration management (wink wink Ansible), this habit will perish.
 
 ## Step 2: playbooks
 
@@ -166,7 +166,7 @@ The deployment is something that was previously automated with a shell script, s
 
 So the first thing that bothers me is that rsync is provided by Ansible in a module called `synchronize`. Why?! Except for that, nothing too fancy -- everything you expect from rsync is provided in the module. It's also not a bad idea to extend the machine update playbook above to also install rsync onto all nodes.
 
-Autogen and configure? Just use `command` module and execute those directly. For make, there is `make` - nothing extra useful but gets the job done in a nice way. Getting rid of previous RPMs was a bit more painful: the previous shell script used `for pack in $(rpm -qa | grep vdsm); do rpm -e $pack --nodeps; done`. After fiddling with `yum` module, I've found out that the simplest solution works: just call `shell` module with the script and be done with it. What really annoys me is the installation of new RPMs: initially, the plan was to use `yum` module and install everything in rpmbuild/RPMS/\*/vdsm-\*.rpm. Surprise, `yum` does not support wildcards for local paths. It's probably possible to get all the files in rpmbuild/RPMS and feed them into `yum` module, but why? `shell: yum -y install /root/rpmbuild/RPMS/*/vdsm-*.rpm` to the rescue. 
+Autogen and configure? Just use `command` module and execute those directly. For make, there is `make` - nothing extra useful but gets the job done in a nice way. Getting rid of previous RPMs was a bit more painful: the previous shell script used `for pack in $(rpm -qa | grep vdsm); do rpm -e $pack --nodeps; done`. After fiddling with `yum` module, I've found out that the simplest solution works: just call `shell` module with the script and be done with it. What really annoys me is the installation of new RPMs: initially, the plan was to use `yum` module and install everything in rpmbuild/RPMS/\*/vdsm-\*.rpm. Surprise, `yum` does not support wildcards for local paths. It's probably possible to get all the files in rpmbuild/RPMS and feed them into `yum` module, but that gets annoying. `shell: yum -y install /root/rpmbuild/RPMS/*/vdsm-*.rpm` to the rescue. 
 
 In the end, the deployment file isn't pretty, but it works:
 
