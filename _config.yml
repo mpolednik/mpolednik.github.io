@@ -21,7 +21,6 @@ paginate:         5
 # Custom vars
 version:          1.0.0
 
-gems: [
-    jekyll-paginate
-    jekyll-feed
-]
+plugins:
+    - jekyll-paginate
+    - jekyll-feed
