@@ -9,12 +9,12 @@ permalink:        pretty
 title:            mpolednik.github.io
 tagline:          'virtualization & tech blog'
 description:      'A software engineer and virtualization enthusiast working on oVirt project.'
-url:              http://mpolednik.github.io
+url:              https://mpolednik.github.io
 excerpt_separator: '<!--more-->'
 
 author:
   name:           'Martin Polednik'
-  url:            http://mpolednik.github.io
+  url:            https://mpolednik.github.io
 
 paginate:         5
 
@@ -23,4 +23,3 @@ version:          1.0.0
 
 plugins:
     - jekyll-paginate
-    - jekyll-feed
