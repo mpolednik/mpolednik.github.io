@@ -186,7 +186,7 @@ In the end, the deployment file isn't pretty, but it works:
 
       - name: rsync over vdsm development directory
         synchronize:
-            src: '{{ local_vdsm }}'
+            src: '{{ '{{' }} local_vdsm{{ }} }}'
             dest: /root/vdsm/
             delete: yes
             recursive: yes
