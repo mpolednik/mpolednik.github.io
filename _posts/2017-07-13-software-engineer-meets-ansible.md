@@ -38,7 +38,7 @@ There are 3 tasks to be automated in the development environment:
 Easy enough. Reading the awesome [Ansible documentation](http://docs.ansible.com/ansible/intro_getting_started.html), all I have to do is
 
 1. create an inventory of the systems
-2. create 3 playbooks, each handling one of the objectives above
+2. create 3 [playbooks](http://docs.ansible.com/ansible/playbooks.html), each handling one of the objectives above
 3. ansible -i inventory playbook.yml
 
 ## Ansible Inventory
@@ -166,7 +166,11 @@ The deployment is something that was previously automated with a shell script, s
 
 So the first thing that bothers me is that rsync is provided by Ansible in a module called `synchronize`. Why?! Except for that, nothing too fancy -- everything you expect from rsync is provided in the module. It's also not a bad idea to extend the machine update playbook above to also install rsync onto all nodes.
 
-Autogen and configure? Just use `command` module and execute those directly. For make, there is `make` - nothing extra useful but gets the job done in a nice way. Getting rid of previous RPMs was a bit more painful: the previous shell script used `for pack in $(rpm -qa | grep vdsm); do rpm -e $pack --nodeps; done`. After fiddling with `yum` module, I've found out that the simplest solution works: just call `shell` module with the script and be done with it. What really annoys me is the installation of new RPMs: initially, the plan was to use `yum` module and install everything in rpmbuild/RPMS/\*/vdsm-\*.rpm. Surprise, `yum` does not support wildcards for local paths. It's probably possible to get all the files in rpmbuild/RPMS and feed them into `yum` module, but that gets annoying. `shell: yum -y install /root/rpmbuild/RPMS/*/vdsm-*.rpm` to the rescue. 
+Autogen and configure? Just use `command` module and execute those directly. For make, there is `make` - nothing extra useful but gets the job done in a nice way. Getting rid of previous RPMs was a bit more painful: the previous shell script was
+
+`for pack in $(rpm -qa | grep vdsm); do rpm -e $pack --nodeps; done`
+
+After fiddling with `yum` module, I've found out that the simplest solution works: just call `shell` module with the script and be done with it. What really annoys me is the installation of new RPMs: initially, the plan was to use `yum` module and install everything in rpmbuild/RPMS/\*/vdsm-\*.rpm. Surprise, `yum` does not expand wildcards for local paths. It's probably possible to get all the files in rpmbuild/RPMS and feed them into `yum` module, but that gets annoying. `shell: yum -y install /root/rpmbuild/RPMS/*/vdsm-*.rpm` to the rescue. 
 
 In the end, the deployment file isn't pretty, but it works:
 
@@ -227,7 +231,7 @@ In the end, the deployment file isn't pretty, but it works:
 
 ## Step 2.2: engine deployment
 
-Actually, I didn't get that far. Something to hope for in the next post? :)
+Actually, I didn't get that far. Something to hope for in a future post? :)
 
 ## Summary
 
