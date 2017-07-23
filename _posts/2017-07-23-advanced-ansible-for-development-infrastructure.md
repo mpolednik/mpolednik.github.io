@@ -2,7 +2,6 @@
 layout: post
 title: Advanced Ansible for Development Infrastructure
 comments: true
-published: false
 ---
 
 ## Introduction
@@ -22,7 +21,7 @@ As a remainder, there are 3 main objectives (= 3 actual playbooks).
 There is also a new constraint for VDSM building and deployment: everything has to use least privileges possible. The RPMs must not be built under root user, but under a new `developer` account. The account must be present on all host -- one of the playbooks needs to take care of that.
 
 ## Variables, Includes
-To enable code reuse, variables are our first step. Although they are not extremely useful for everything in Ansible land, some tasks simply beg to be parametric. Perfect example is a creation of a user. Ansible ensures that the specified user exists on the target machines by a [task](http://docs.ansible.com/ansible/glossary.html#term-tasks) like this:
+To enable code reuse, variables are our first step. Although they are not super useful for everything in the Ansible land, some tasks simply beg to be parametric. Perfect example is a creation of a user. Ansible ensures that the specified user exists on the target machines by a [task](http://docs.ansible.com/ansible/glossary.html#term-tasks) like this:
 
 ```yaml
 - name: 'ensure a user developer is present'
@@ -33,9 +32,9 @@ To enable code reuse, variables are our first step. Although they are not extrem
       state: present
 ```
 
-Such task definition by itself isn't generic enough and has a simple caveat -- we don't set the user password. The password part of the issue is actually pretty simple: we already know of group [variables](http://docs.ansible.com/ansible/playbooks_variables.html), so it's only a matter of adding `password: '{{ '{{' }} password{{ }} }}'` to the user attributes and having the password defined under group\_vars (make sure it's in correct format though, as explained in `ansible_doc user`.
+Such task definition by itself isn't generic enough and has a simple caveat -- we don't set the user password. The password part of the issue is actually pretty simple: we already know of group [variables](http://docs.ansible.com/ansible/playbooks_variables.html), so it's only a matter of adding `password: '{{ '{{' }} password{{ }} }}'` to the user attributes and having the password defined under group\_vars (make sure it's in correct format though, as explained in `ansible_doc user`).
 
-Now, what if we need another user? Could we just copy the definition and change the name? That's like recipe for maintenance hell. Instead, Ansible has a concept of [includes](http://docs.ansible.com/ansible/playbooks_roles.html). The user creation can be playbook or task on it's own, and the main playbook just includes it. On top of that, includes support passing variables. Instead of creating a specific user in a [playbook](http://docs.ansible.com/ansible/glossary.html#term-playbooks)
+Now, what if we need another user? Could we just copy the definition and change the name? That's like a recipe for a maintenance hell. Instead, Ansible has a concept of [includes](http://docs.ansible.com/ansible/playbooks_roles.html). The user creation can be playbook or task on it's own, and the main playbook just includes it. On top of that, includes support passing variables. Instead of creating a specific user in a [playbook](http://docs.ansible.com/ansible/glossary.html#term-playbooks)
 
 ```yaml
 - hosts: nodes
@@ -128,12 +127,33 @@ Privileged (let's assume root) case is similar to the unprivileged case with a s
 
 ## Handlers
 
+Handlers are the callback mechanism in Ansible. Each task may notify a handler - either a single handler by name, or a group of handlers that listen to specific notification. After experimenting with handlers in the infrastructure deployment, two important points surfaced:
+
+1. it's better to use listen/notify than notifying handler by name
+2. passing variables to handlers is annoying, causing parametrized tasks to be a better choice in most of the situations (see this [gist](https://gist.github.com/schlueter/85bd22cd6c9e2bd054a3))
+
+The basis for 1. is that calling handler by name won't work if handler's name changes. That is unnecessary coupling of unrelated information. As for 2., handlers use globally defined variables or facts. There doesn't seem to be a way to pass a variable to it directly except for the mentioned global setting that every tasks would be required to do.
+
+In the end, I've found the usage of handlers in the management of a small infrastructure to be more of a complication than improvement. That would probably change if playbooks required multiple service restarts -- that is the perfect case for handlers.
+
+```yaml
+handlers:
+    - name: restart vdsm
+      service: name=vdsm state=restarted
+      listen: "restart vdsm"
+
+tasks:
+    - name: configure vdsm
+      command: vdsm-tool configure --force 
+      notify: "restart vdsm"
+```
+
 ## Vault and Keeping Playbooks Public
-[vault](http://docs.ansible.com/ansible/playbooks_vault.html)
+[Vault](http://docs.ansible.com/ansible/playbooks_vault.html) is a way to encrypt various files, mostly variable definitions, in Ansible. Although the idea sounds perfect, it's questionable what kind problem it solves. Sharing encrypted files in a plain sight is a terrible idea as vulnerability in the encryption algorithm could be found, encryption key leaked and other doomsday scenarios could happen. The most sensible usage is internal security, but even then the vault should not be treated as an all-secure solution.
 
 ## Summary
 
-The resulting tree:
+The whole work resulted in a following file hierarchy:
 
 ```
 $ tree .
@@ -146,7 +166,8 @@ $ tree .
 │   ├── rpmmacros
 │   └── zshrc
 ├── group_vars
-│   └── brq-dev
+│   └── ovirt-all
+├── hosts
 ├── tasks
 │   ├── add_user.yml
 │   ├── setup_ssh.yml
@@ -154,3 +175,7 @@ $ tree .
 │   └── setup_zsh.yml
 └── update.yml
 ```
+
+Unfortunately due to a number of private repositories used on the hosts, the idea of keeping all playbooks private doesn't work without destroying readability of the playbooks. The share-able playbooks are VDSM to host deployment [gist](https://gist.github.com/mpolednik/fac2fb927b0d7d09073754c6442ce35e) and engine deployment [gist](https://gist.github.com/mpolednik/3be277e34ac8e27e17b5ca291796de7a). That is an unfortunate result -- keeping the playbooks in public would make the infrastructure easily reproducible without internal communication. If you have any idea how to solve that, feel free to leave a comment - I'd be happy to try it.
+
+Except for the sharing hiccup, ansible seems like a perfect candidate for this kind of task. The machines are easily reinstalled using [kickstart](http://pykickstart.readthedocs.io/en/latest/) and then brought up to date & configured with few playbooks. The MTTD (mean time to deployment) is now shorter, requires no user intervention and allows for a peaceful lunch breaks.
