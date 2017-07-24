@@ -34,6 +34,22 @@ To enable code reuse, variables are our first step. Although they are not super 
 
 Such task definition by itself isn't generic enough and has a simple caveat -- we don't set the user password. The password part of the issue is actually pretty simple: we already know of group [variables](http://docs.ansible.com/ansible/playbooks_variables.html), so it's only a matter of adding `password: '{{ '{{' }} password{{ }} }}'` to the user attributes and having the password defined under group\_vars (make sure it's in correct format though, as explained in `ansible_doc user`).
 
+```
+# to save some time, the password in the example is 'developer' :)
+$ cat group_vars/ovirt-all
+password: $6$W31Ou3qt$fJaaOQYYxZlTcgTWtyIh1MQAA765s7EcsdV.tw.h6Ds4UX2O.q.7H75RRRR1FF4aPl7Saay.X0wMW4O7u1L4D0
+```
+
+```yaml
+- name: 'ensure a user developer is present'
+  user:
+      name: developer
+      groups: wheel
+      append: yes
+      state: present
+      password: '{{ '{{' }} password{{ }} }}'
+```
+
 Now, what if we need another user? Could we just copy the definition and change the name? That's like a recipe for a maintenance hell. Instead, Ansible has a concept of [includes](http://docs.ansible.com/ansible/playbooks_roles.html). The user creation can be playbook or task on it's own, and the main playbook just includes it. On top of that, includes support passing variables. Instead of creating a specific user in a [playbook](http://docs.ansible.com/ansible/glossary.html#term-playbooks)
 
 ```yaml
@@ -45,7 +61,7 @@ Now, what if we need another user? Could we just copy the definition and change 
             groups: wheel
             append: yes
             state: present
-        become: yes
+            password: '{{ '{{' }} password{{ }} }}'
 ```
 
 we may define the task separately using a variable(s) (in this case, the tasks is defined in `tasks/` subdirectory)
@@ -57,6 +73,7 @@ we may define the task separately using a variable(s) (in this case, the tasks i
       groups: wheel
       append: yes
       state: present
+      password: '{{ '{{' }} password{{ }} }}'
 ```
 
 and include the task:
@@ -73,7 +90,7 @@ We are now able to create any user by just including the task and setting the `u
 - name: 'Clone oh-my-zsh repo ({{ '{{' }} user{{ }} }})'
   git:
       repo: https://github.com/robbyrussell/oh-my-zsh.git
-      dest: '{{ '{{' }} password{{ }} }}/{{ '{{' }} user }}/.oh-my-zsh'
+      dest: '{{ '{{' }} path{{ }} }}/{{ '{{' }} user }}/.oh-my-zsh'
 ```
 
 where path is either `/` or `/home`, depending on whether the user to be created is root or a user whose home directory resides elsewhere.
@@ -176,6 +193,6 @@ $ tree .
 └── update.yml
 ```
 
-Unfortunately due to a number of private repositories used on the hosts, the idea of keeping all playbooks private doesn't work without destroying readability of the playbooks. The share-able playbooks are VDSM to host deployment [gist](https://gist.github.com/mpolednik/fac2fb927b0d7d09073754c6442ce35e) and engine deployment [gist](https://gist.github.com/mpolednik/3be277e34ac8e27e17b5ca291796de7a). That is an unfortunate result -- keeping the playbooks in public would make the infrastructure easily reproducible without internal communication. If you have any idea how to solve that, feel free to leave a comment - I'd be happy to try it.
+Unfortunately due to number of private repositories used on the hosts, the idea of keeping all playbooks public doesn't work without destroying their readability. The share-able playbooks are VDSM to host deployment [gist](https://gist.github.com/mpolednik/fac2fb927b0d7d09073754c6442ce35e) and engine deployment [gist](https://gist.github.com/mpolednik/3be277e34ac8e27e17b5ca291796de7a). That is an unfortunate result -- keeping the playbooks in public would make the infrastructure easily reproducible without internal communication. If you have any idea how to solve that, feel free to leave a comment - I'd be happy to try it.
 
-Except for the sharing hiccup, ansible seems like a perfect candidate for this kind of task. The machines are easily reinstalled using [kickstart](http://pykickstart.readthedocs.io/en/latest/) and then brought up to date & configured with few playbooks. The MTTD (mean time to deployment) is now shorter, requires no user intervention and allows for a peaceful lunch breaks.
+Except for the sharing hiccup, Ansible seems like a perfect candidate for this kind of task. The machines are easily reinstalled using [kickstart](http://pykickstart.readthedocs.io/en/latest/) and then brought up to date & configured with few playbooks. The MTTD (mean time to deployment) is now shorter, requires no user interaction and allows for peaceful lunch breaks.
