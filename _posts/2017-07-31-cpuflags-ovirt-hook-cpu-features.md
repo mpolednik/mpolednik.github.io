@@ -2,7 +2,6 @@
 layout: post
 title: cpuflags, oVirt and vCPU features
 comments: true
-published: false
 ---
 
 ## Introduction
@@ -15,7 +14,7 @@ A new hook is in the oVirt ecosystem: cpuflags. The cpuflags hook is a small but
 
 Before digging deeper into what the hook does, it is important to understand what libvirt CPU models and features are. If you are already educated in this subject matter, feel free to skip the chapter.
 
-When creating a libvirt domain, which is just a XML representation of qemu command line, we usually select a CPU model. Libvirt CPU models are just sets of features -- the CPU flags as found in CPUID instruction. Interesting bit is that CPUID really is x86_64 specific and provides a huge amount of data on various CPU capabilities. Other architectures, such as POWER8, do not provide such granular information. This post is therefore focused on x86_64. So what can we find out about a CPU? To spare us the traversing of all CPUID leaves, libvirt provides EAX and EDX indexes for common features in the `/usr/share/libvirt/cpu_map.xml` file.
+When creating a libvirt domain, which is just an XML representation of qemu command line, we usually select a CPU model. Libvirt CPU models are just sets of features -- the CPU flags as found in CPUID instruction. Interesting bit is that CPUID really is x86_64 specific and provides a huge amount of data on various CPU capabilities. Other architectures, such as POWER8, do not provide such granular information. This post is therefore focused on x86_64. So what can we find out about a CPU? To spare us the traversing of all CPUID leaves, libvirt provides EAX and EDX indexes for common features in the `/usr/share/libvirt/cpu_map.xml` file.
 
 ```
 $ cat /usr/share/libvirt/cpu_map.xml
@@ -79,7 +78,7 @@ The special cpu models -- host-model and host-passthrough allow for a very speci
 The hook RPM is called vdsm-hook-cpuflags. To configure which features should be required or avoided, custom property called `cpuflags` is used. The property uses a specific syntax:
 
 1. +feature includes a feature
-2. -feature exlucdes a feature
+2. -feature excludes a feature
 3. uppercase GROUP includes a group of features
 4. features and groups are separated by comma (`,`)
 
