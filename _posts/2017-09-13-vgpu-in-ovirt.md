@@ -6,7 +6,7 @@ comments: true
 
 ## Introduction
 
-In oVirt 4.1.4, we added a new feature called vGPU passthrough. vGPU is a technology that allows us to "shard" a physical GPU (that supports vGPU) into number of smaller instances. Each instance can then be assigned to a VM, giving us the ability to run GPU-accelerated workloads. There is quite a bit of setup required to get the vGPU instance into the VM, and this is where oVirt comes to picture: it requires one time (per hypervisor and per VM) setup, but after that the vGPU creation and deletion is happening seamlessly. This post serves as a step-by-step guide to getting the vGPU feature up and running.
+In oVirt 4.1.4, we added a new feature called vGPU passthrough. vGPU is a technology that allows us to "shard" a physical GPU (GRID capable, like NVIDIA Tesla M60) into number of smaller instances. Each instance can then be assigned to a VM, giving us the ability to run GPU-accelerated workloads. There is quite a bit of setup required to get the vGPU instance into the VM, and this is where oVirt comes to picture: it requires one time (per hypervisor and per VM) setup, but after that the vGPU creation and deletion is happening seamlessly. This post serves as a step-by-step guide to getting the vGPU feature up and running.
 
 <!--more-->
 
@@ -85,3 +85,4 @@ As vGPU does not have a graphical output, Spice/VNC should still be used as a pr
 ## Summary
 
 And that's it! Following these steps, we have a VM that has a vGPU. To verify the functionality, it may be a good idea to run software capable of taking advantage of the vGPU and see whether the performance meets the requirements.
+
