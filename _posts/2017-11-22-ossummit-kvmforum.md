@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Open Source Summit EU & KVM Forum 2017
+title: Open Source Summit EU & KVM Forum '17
 comments: true
 ---
 
