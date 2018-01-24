@@ -12,7 +12,9 @@ In oVirt 4.1.4, we added a new feature called vGPU passthrough. vGPU is a techno
 
 ## Step 1: Host Requirements
 
-As far as hardware goes, the essential requirement is having a hardware that has IOMMU. The IOMMU must also be enabled -- follow the steps in an [older post]({% post_url 2017-03-19-hostdev-passthrough-pci %}#requirements). The second requirement is having vGPU capable GPU -- please refer to [NVIDIA datasheet](http://images.nvidia.com/content/grid/pdf/188270-NVIDIA-GRID-Datasheet-NV-US-FNL-Web.pdf). The indicator whether IOMMU is enabled can be seen in oVirt engine:
+~~As far as hardware goes, the essential requirement is having a hardware that has IOMMU. The IOMMU must also be enabled -- follow the steps in an [older post]({% post_url 2017-03-19-hostdev-passthrough-pci %}#requirements). The second requirement is having vGPU capable GPU -- please refer to [NVIDIA datasheet](http://images.nvidia.com/content/grid/pdf/188270-NVIDIA-GRID-Datasheet-NV-US-FNL-Web.pdf). The indicator whether IOMMU is enabled can be seen in oVirt engine:~~
+
+*Update: IOMMU is not needed, vGPU should work even if "Device Passthrough" in the screenshot below is disabled.*
 
 {% include image.html name="ovirt-host.png" width="100%" %}
 
