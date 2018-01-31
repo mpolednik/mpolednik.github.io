@@ -16,4 +16,4 @@ Conference (DevConf.cz) by Red Hat in Brno, Czech Republic. I've been given an o
 Slides are available in Tao3D at [github](https://github.com/c3d/slicinggpus-presentation).
 
 ## Recording
-<iframe width="560" height="315" src="https://www.youtube.com/watch?v=G8b9jlFN-nk" frameborder="0" gesture="media" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/G8b9jlFN-nk" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
