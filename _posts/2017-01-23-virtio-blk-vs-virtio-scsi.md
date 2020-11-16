@@ -134,6 +134,11 @@ In summary, virtio-scsi is performing slightly worse than virtio-blk. However as
 
 At the moment, a key difference is the BLKDISCARD capability, supported by virtio-scsi. BLKDISCARD is an ioctl, that discards blocks on a device -- for example using ATA TRIM command on modern SSDs. virtio-blk does not support it and probably never will. As for other potential features, they will most likely be implemented in virtio-scsi first. Due to the complexity of extending virtio-blk it is questionable that any new features will ever be added.
 
+
+> EDIT
+> 
+> BLKDISCARD support was added [in this qemu patch](https://git.qemu.org/?p=qemu.git;a=commitdiff;h=37b06f8d46fe602e630e4) (22 Feb 2019). Never say never I guess.
+
 ## Conclusions
 
 Looking at the advantages of virtio-scsi, I believe it's the correct choice as a default VM disk interface in oVirt. For optimized VMs, there is always the choice of manually switching to virtio-blk (or IDE, if you're optimizing for slowness... or compatibility). For now, adding IO thread may cause more harm than good, therefore we'll leave that for the future.
